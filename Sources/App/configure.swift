@@ -1,4 +1,6 @@
+//import FluentSQLite
 import FluentSQLite
+
 import Vapor
 
 /// Called before your application initializes.
@@ -20,18 +22,20 @@ public func configure(
     /// Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
     /// middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
-    middlewares.use(DateMiddleware.self) // Adds `Date` header to responses
+//    middlewares.use(DateMiddleware.self) // Adds `Date` header to responses
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     services.register(middlewares)
 
     // Configure a SQLite database
     let sqlite: SQLiteDatabase
+//    sqlite = try SQLiteDatabase(storage: .file(path: "/Users/seanrankine/Desktop/data.sqlite"))
+
     if env.isRelease {
         /// Create file-based SQLite db using $SQLITE_PATH from process env
         sqlite = try SQLiteDatabase(storage: .file(path: Environment.get("SQLITE_PATH")!))
     } else {
         /// Create an in-memory SQLite database
-        sqlite = try SQLiteDatabase(storage: .memory)
+        sqlite = try SQLiteDatabase(storage: .file(path: "/Users/seanrankine/Desktop/db.sqlite"))
     }
 
     /// Register the configured SQLite database to the database config.
@@ -41,7 +45,8 @@ public func configure(
 
     /// Configure migrations
     var migrations = MigrationConfig()
-    migrations.add(model: Todo.self, database: .sqlite)
+    migrations.add(model: Property.self, database: .sqlite)
+    migrations.add(model: Issue.self, database: .sqlite)
     services.register(migrations)
 
 }
